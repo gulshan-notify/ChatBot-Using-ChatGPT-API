@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chatbot</title>
+    <style>
+        /* Chat container */
+        .chat-container {
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            overflow: hidden;
+            width: 800px;
+            margin: auto;
+        }
+
+        /* Chat messages */
+        .chat-messages {
+            padding: 10px;
+            height: 300px;
+            overflow-y: scroll;
+        }
+
+        /* User input */
+        .user-input {
+            padding: 10px;
+            border-top: 1px solid #ccc;
+        }
+
+        /* Chat input field */
+        .chat-input {
+            width: calc(100% - 20px);
+            padding: 5px;
+            margin-right: 5px;
+            border: none;
+            border-radius: 3px;
+        }
+
+        /* Send button */
+        .send-button {
+            padding: 5px 10px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="chat-container">
+        <div class="chat-messages" id="chat-messages">
+            <!-- Chat messages will be added here -->
+        </div>
+        <div class="user-input">
+            <input type="text" id="user-input" class="chat-input" placeholder="Type a message...">
+            <button id="send-button" class="send-button">Send</button>
+            <button id="clear-button" onclick="clearData()" class="send-button" style="background-color: red;">Clear</button>
+        </div>
+        
+    </div>
+  <div style="text-align: center;">
+    <span style="font-family: Arial, sans-serif; font-size: 80px; color: #4CAF50; text-shadow: 2px 2px 4px #888888;">What's Up</span>
+</div>
+
+
+    <script>
+        const chatMessages = document.getElementById('chat-messages');
+        const userInput = document.getElementById('user-input');
+        const sendButton = document.getElementById('send-button');
+
+        // Function to add user message to chat
+        function addUserMessage(message) {
+            const div = document.createElement('div');
+            div.innerHTML = `<strong>You:</strong> ${message}`;
+            chatMessages.appendChild(div);
+        }
+
+        // Function to add bot message to chat
+        function addBotMessage(message) {
+				const div = document.createElement('div');
+				div.innerHTML = `<strong>Bot:</strong> ${message}`;
+				chatMessages.appendChild(div);
+			}
+
+			// Function to handle user input
+			function handleUserInput() {
+				debugger;
+				const message = userInput.value;
+				addUserMessage(message);
+				userInput.value = '';
+
+				// Send the message to your backend
+				fetch('/bot', {
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json'
+					},
+					body: JSON.stringify({message: message})
+				})
+					.then(response => response.text())
+					.then(data => {
+						addBotMessage(data);
+						chatMessages.scrollTop = chatMessages.scrollHeight;
+					})
+					.catch(error => {
+						console.error('Error:', error);
+					});
+			}
+
+
+        // Event listener for send button click
+        sendButton.addEventListener('click', handleUserInput);
+
+        // Event listener for Enter key press in input field
+        userInput.addEventListener('keypress', function(event) {
+            if (event.key === 'Enter') {
+                handleUserInput();
+            }
+        });
+        
+      function clearData(){
+			document.getElementById("chat-messages").innerHTML = '';
+		}
+        
+        
+    </script>
+</body>
+</html>
